@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>모던 연대표</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f0f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .input-section {
+      margin-bottom: 30px;
+    }
+
+    .input-section input {
+      padding: 10px;
+      font-size: 1em;
+      margin-right: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .input-section button {
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .timeline {
+      display: flex;
+      flex-direction: row;
+      overflow-x: auto;
+      padding: 20px;
+    }
+
+    .year {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 80px;
+    }
+
+    .year h2 {
+      color: #333;
+      font-size: 1.5em;
+      margin-bottom: 20px;
+    }
+
+    .event {
+      background-color: #fff;
+      color: #555;
+      padding: 15px 20px;
+      margin: 10px 0;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 200px;
+      text-align: center;
+      position: relative;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .event:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .event::before {
+      content: '';
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background-color: #007bff;
+      border-radius: 50%;
+      top: 50%;
+      left: -30px;
+      transform: translateY(-50%);
+    }
+  </style>
+</head>
+<body>
+  <div class="input-section">
+    <input type="number" id="yearInput" placeholder="연도 입력" />
+    <input type="text" id="eventInput" placeholder="사건 입력" />
+    <button onclick="addEvent()">추가</button>
+  </div>
+
+  <div class="timeline" id="timeline">
+    <!-- 동적으로 연도와 사건이 추가될 영역 -->
+  </div>
+
+  <script>
+    let timelineData = [];
+
+    function addEvent() {
+      const yearInput = document.getElementById('yearInput');
+      const eventInput = document.getElementById('eventInput');
+      const yearValue = parseInt(yearInput.value);
+      const eventValue = eventInput.value.trim();
+
+      if (!yearValue || !eventValue) {
+        alert('유효한 연도와 사건을 입력하세요.');
+        return;
+      }
+
+      // 기존 연도에 사건 추가 또는 새로운 연도와 사건 추가
+      const existingYear = timelineData.find(item => item.year === yearValue);
+      if (existingYear) {
+        existingYear.events.push(eventValue);
+      } else {
+        timelineData.push({ year: yearValue, events: [eventValue] });
+      }
+
+      // 연대 순으로 정렬
+      timelineData.sort((a, b) => a.year - b.year);
+
+      // 입력 필드 초기화
+      yearInput.value = '';
+      eventInput.value = '';
+
+      renderTimeline();
+    }
+
+    function renderTimeline() {
+      const timeline = document.getElementById('timeline');
+      timeline.innerHTML = ''; // 기존 내용을 초기화
+
+      timelineData.forEach(item => {
+        const yearElement = document.createElement('div');
+        yearElement.classList.add('year');
+
+        // 연도 추가
+        let eventsHTML = '';
+        item.events.forEach(event => {
+          eventsHTML += `<div class="event">${event}</div>`;
+        });
+
+        yearElement.innerHTML = `
+          <h2>${item.year}</h2>
+          ${eventsHTML}
+        `;
+        timeline.appendChild(yearElement);
+      });
+    }
+  </script>
+  <script>
+    let timelineData = JSON.parse(localStorage.getItem('timelineData')) || [];
+  
+    function addEvent() {
+      const yearInput = document.getElementById('yearInput');
+      const eventInput = document.getElementById('eventInput');
+      const yearValue = parseInt(yearInput.value);
+      const eventValue = eventInput.value.trim();
+  
+      if (!yearValue || !eventValue) {
+        alert('유효한 연도와 사건을 입력하세요.');
+        return;
+      }
+  
+      const existingYear = timelineData.find(item => item.year === yearValue);
+      if (existingYear) {
+        existingYear.events.push(eventValue);
+      } else {
+        timelineData.push({ year: yearValue, events: [eventValue] });
+      }
+  
+      timelineData.sort((a, b) => a.year - b.year);
+  
+      yearInput.value = '';
+      eventInput.value = '';
+  
+      // 데이터 localStorage에 저장
+      localStorage.setItem('timelineData', JSON.stringify(timelineData));
+  
+      renderTimeline();
+    }
+  
+    function renderTimeline() {
+      const timeline = document.getElementById('timeline');
+      timeline.innerHTML = '';
+  
+      timelineData.forEach(item => {
+        const yearElement = document.createElement('div');
+        yearElement.classList.add('year');
+  
+        let eventsHTML = '';
+        item.events.forEach(event => {
+          eventsHTML += `<div class="event">${event}</div>`;
+        });
+  
+        yearElement.innerHTML = `
+          <h2>${item.year}</h2>
+          ${eventsHTML}
+        `;
+        timeline.appendChild(yearElement);
+      });
+    }
+  
+    // 페이지 로드 시 타임라인 렌더링
+    document.addEventListener('DOMContentLoaded', renderTimeline);
+  </script>
+  
+</body>
+</html>
