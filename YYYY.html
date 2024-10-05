@@ -154,60 +154,68 @@
     }
   </script>
   <script>
-    let timelineData = JSON.parse(localStorage.getItem('timelineData')) || [];
-  
-    function addEvent() {
-      const yearInput = document.getElementById('yearInput');
-      const eventInput = document.getElementById('eventInput');
-      const yearValue = parseInt(yearInput.value);
-      const eventValue = eventInput.value.trim();
-  
-      if (!yearValue || !eventValue) {
-        alert('유효한 연도와 사건을 입력하세요.');
-        return;
-      }
-  
-      const existingYear = timelineData.find(item => item.year === yearValue);
-      if (existingYear) {
-        existingYear.events.push(eventValue);
-      } else {
-        timelineData.push({ year: yearValue, events: [eventValue] });
-      }
-  
-      timelineData.sort((a, b) => a.year - b.year);
-  
-      yearInput.value = '';
-      eventInput.value = '';
-  
-      // 데이터 localStorage에 저장
-      localStorage.setItem('timelineData', JSON.stringify(timelineData));
-  
-      renderTimeline();
-    }
-  
-    function renderTimeline() {
-      const timeline = document.getElementById('timeline');
-      timeline.innerHTML = '';
-  
-      timelineData.forEach(item => {
-        const yearElement = document.createElement('div');
-        yearElement.classList.add('year');
-  
-        let eventsHTML = '';
-        item.events.forEach(event => {
-          eventsHTML += `<div class="event">${event}</div>`;
-        });
-  
-        yearElement.innerHTML = `
-          <h2>${item.year}</h2>
-          ${eventsHTML}
-        `;
-        timeline.appendChild(yearElement);
-      });
-    }
-  
-    // 페이지 로드 시 타임라인 렌더링
-    document.addEventListener('DOMContentLoaded', renderTimeline);
+    let timelineData = [];
+
+// 페이지 로드 시 로컬 스토리지에서 데이터 가져오기
+window.onload = function() {
+  const storedData = localStorage.getItem('timelineData');
+  if (storedData) {
+    timelineData = JSON.parse(storedData);
+    renderTimeline();
+  }
+};
+
+function addEvent() {
+  const yearInput = document.getElementById('yearInput');
+  const eventInput = document.getElementById('eventInput');
+  const yearValue = parseInt(yearInput.value);
+  const eventValue = eventInput.value.trim();
+
+  if (!yearValue || !eventValue) {
+    alert('유효한 연도와 사건을 입력하세요.');
+    return;
+  }
+
+  const existingYear = timelineData.find(item => item.year === yearValue);
+  if (existingYear) {
+    existingYear.events.push(eventValue);
+  } else {
+    timelineData.push({ year: yearValue, events: [eventValue] });
+  }
+
+  // 연대 순으로 정렬
+  timelineData.sort((a, b) => a.year - b.year);
+
+  // 로컬 스토리지에 데이터 저장
+  localStorage.setItem('timelineData', JSON.stringify(timelineData));
+
+  yearInput.value = '';
+  eventInput.value = '';
+
+  renderTimeline();
+}
+
+function renderTimeline() {
+  const timeline = document.getElementById('timeline');
+  timeline.innerHTML = '';
+
+  timelineData.forEach(item => {
+    const yearElement = document.createElement('div');
+    yearElement.classList.add('year');
+
+    let eventsHTML = '';
+    item.events.forEach(event => {
+      eventsHTML += `<div class="event">${event}</div>`;
+    });
+
+    yearElement.innerHTML = `
+      <h2>${item.year}</h2>
+      ${eventsHTML}
+    `;
+    timeline.appendChild(yearElement);
+  });
+}
+
   </script>
   
 </body>
