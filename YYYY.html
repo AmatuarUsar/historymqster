@@ -100,7 +100,10 @@
   </div>
 
   <script>
-    let timelineData = [];
+    // 변수를 선언하기 전에 이전에 선언된 변수가 없는지 확인
+    if (typeof timelineData === 'undefined') {
+      var timelineData = [];
+    }
 
     // 페이지 로드 시 로컬 스토리지에서 데이터 가져오기
     window.onload = function() {
